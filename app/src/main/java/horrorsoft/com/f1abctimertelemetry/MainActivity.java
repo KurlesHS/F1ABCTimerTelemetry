@@ -45,6 +45,12 @@ public class MainActivity extends Activity {
         }
     }
 
+    @Click(R.id.buttonMap)
+    void onMapButton() {
+        Intent intent = new Intent(this, GoogleMapsActivity_.class);
+        startActivity(intent);
+    }
+
     @OnActivityResult(REQUEST_BT_DEVICE_MAC_ADDRESS)
     void onRequestDeviceMacAddressDone(int resultCode, Intent data) {
         if (resultCode == RESULT_OK) {

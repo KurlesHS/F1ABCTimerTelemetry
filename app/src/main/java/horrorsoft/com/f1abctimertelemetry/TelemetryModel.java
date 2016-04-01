@@ -17,6 +17,23 @@ import java.nio.ByteOrder;
  */
 @EBean(scope = EBean.Scope.Singleton)
 class TelemetryModel implements IBluetoothDataListener{
+    static final int IDLE = 0;
+    static final int TELEMETRY_RESPONSE = 1;
+    static final int GPS_RESPONSE = 1;
+
+    boolean mFlightMode;
+
+    TelemetryModel() {
+        mFlightMode = false;
+    }
+
+    private GpsData mLastGpsPoint = null;
+
+    public void setGpsDataListener(IGpsDataListener mGpsDataListener) {
+        this.mGpsDataListener = mGpsDataListener;
+    }
+
+    private IGpsDataListener mGpsDataListener = null;
 
     @RootContext
     protected Context context;
@@ -25,6 +42,10 @@ class TelemetryModel implements IBluetoothDataListener{
 
     public boolean isOpen() {
         return device != null && device.isOpen();
+    }
+
+    public GpsData lastGpsPoint() {
+        return mLastGpsPoint;
     }
 
     public void open(String macAddress) {
@@ -47,23 +68,28 @@ class TelemetryModel implements IBluetoothDataListener{
     @Override
     public void readyRead() {
         // Toast.makeText(context, "Ready read", Toast.LENGTH_SHORT).show();
+
         int len = device.bytesAvailable();
         if (len >= 17) {
             byte buff[] = new byte[len];
             device.read(buff);
             byte bytes[] = new byte[4];
             System.arraycopy(buff, 3, bytes, 0, 4);
-            float f = (float) (ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN).getInt() / 1000000.);
+            float latitude = (float) (ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN).getInt() / 1000000.);
             System.arraycopy(buff, 7, bytes, 0, 4);
-            float f2 = (float) (ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN).getInt() / 1000000.);
+            float longitude = (float) (ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN).getInt() / 1000000.);
+            boolean isFlightMode =(int)buff[2] != 0;
+            // Toast.makeText(context, String.format("Ready read: %d %f, %f",(int)buff[2], latitude, longitude), Toast.LENGTH_SHORT).show();
+            mLastGpsPoint = new GpsData(latitude, longitude, isFlightMode);
+            if (mGpsDataListener != null) {
+                mGpsDataListener.newPosition(mLastGpsPoint);
+            }
 
-            Toast.makeText(context, String.format("Ready read: %d %f, %f",(int)buff[2], f, f2), Toast.LENGTH_SHORT).show();
-            // device.write(buff);
             sendCommand();
         }
     }
 
-    @Background(delay = 2000)
+    @Background(delay = 500)
     protected void sendCommand() {
         if (device != null) {
             device.write(getCommand((byte) 0xfe));

@@ -9,4 +9,10 @@
             android:layout_height="wrap_content"
             android:text="Connect"
             android:id="@+id/button_connect_disconnect" android:layout_gravity="center_horizontal"/>
+    <Button
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="91dp"
+            android:layout_height="wrap_content"
+            android:text="Map"
+            android:id="@+id/buttonMap" android:layout_gravity="center_horizontal"/>
 </LinearLayout>

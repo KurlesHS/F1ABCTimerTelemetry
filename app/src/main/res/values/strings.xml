@@ -23,4 +23,7 @@
     <string name="okFlashBluetoothSetting">pin and name of bluetooth receiver changed</string>
     <string name="errorFlashBluetoothSetting">pin and name of bluetooth receiver is not changed</string>
     <string name="title_activity_telemetry">Telemetry</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

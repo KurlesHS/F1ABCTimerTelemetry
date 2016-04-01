@@ -9,6 +9,7 @@ import org.androidannotations.annotations.EBean;
 import org.androidannotations.annotations.RootContext;
 
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 /**
  * Created by Alexey on 01.04.2016.
@@ -52,9 +53,9 @@ class TelemetryModel implements IBluetoothDataListener{
             device.read(buff);
             byte bytes[] = new byte[4];
             System.arraycopy(buff, 3, bytes, 0, 4);
-            float f = ByteBuffer.wrap(bytes).getFloat();
+            float f = (float) (ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN).getInt() / 1000000.);
             System.arraycopy(buff, 7, bytes, 0, 4);
-            float f2 = ByteBuffer.wrap(bytes).getFloat();
+            float f2 = (float) (ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN).getInt() / 1000000.);
 
             Toast.makeText(context, String.format("Ready read: %d %f, %f",(int)buff[2], f, f2), Toast.LENGTH_SHORT).show();
             // device.write(buff);

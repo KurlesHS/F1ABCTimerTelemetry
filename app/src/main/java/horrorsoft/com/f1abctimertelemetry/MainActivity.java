@@ -1,31 +1,44 @@
 package horrorsoft.com.f1abctimertelemetry;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Button;
 import android.widget.Toast;
 import horrorsoft.com.f1abctimertelemetry.bluetooth.DeviceListActivity;
-import org.androidannotations.annotations.Bean;
-import org.androidannotations.annotations.Click;
-import org.androidannotations.annotations.EActivity;
-import org.androidannotations.annotations.OnActivityResult;
+import horrorsoft.com.f1abctimertelemetry.bluetooth.IBluetoothStatusListener;
+import org.androidannotations.annotations.*;
 
 @EActivity
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements IBluetoothStatusListener {
 
     private static final int REQUEST_BT_DEVICE_MAC_ADDRESS = 0;
 
     @Bean
     TelemetryModel mModel;
 
+
+    @ViewById(R.id.button_connect_disconnect)
+    protected Button mConnectDisconnectButton;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Context context = this.getApplicationContext();
         setContentView(R.layout.main_layout);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mModel.removeBlueToothStatusListener(this);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mModel.addBlueToothStatusListener(this);
     }
 
     @Override
@@ -51,6 +64,12 @@ public class MainActivity extends Activity {
         startActivity(intent);
     }
 
+    @Click(R.id.button_telemetry)
+    void onTelemetryButtonClicked() {
+        Intent intent = new Intent(this, TelemetryActivity_.class);
+        startActivity(intent);
+    }
+
     @OnActivityResult(REQUEST_BT_DEVICE_MAC_ADDRESS)
     void onRequestDeviceMacAddressDone(int resultCode, Intent data) {
         if (resultCode == RESULT_OK) {
@@ -60,8 +79,6 @@ public class MainActivity extends Activity {
         } else {
             Toast.makeText(this, "cancel paired with bluetooth device", Toast.LENGTH_SHORT).show();
         }
-
-
     }
 
     @Override
@@ -77,5 +94,15 @@ public class MainActivity extends Activity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void connected() {
+        mConnectDisconnectButton.setText(getResources().getText(R.string.disconnect));
+    }
+
+    @Override
+    public void disconnected() {
+        mConnectDisconnectButton.setText(getResources().getText(R.string.connect));
     }
 }

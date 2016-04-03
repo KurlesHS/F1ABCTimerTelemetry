@@ -1,8 +1,6 @@
 package horrorsoft.com.f1abctimertelemetry;
 
-import android.content.Intent;
 import android.graphics.Color;
-import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -15,6 +13,7 @@ import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EActivity;
 
 import java.util.LinkedList;
+import java.util.List;
 
 
 @EActivity(R.layout.activity_google_maps)
@@ -27,7 +26,7 @@ public class GoogleMapsActivity extends FragmentActivity implements OnMapReadyCa
 
     private Marker mMarker = null;
     private Polyline mRoute = null;
-    LinkedList<GpsData> mRouteData = new LinkedList<>();
+    private List<GpsData> mRouteData = new LinkedList<>();
 
     @Bean
     TelemetryModel mModel;
@@ -41,20 +40,7 @@ public class GoogleMapsActivity extends FragmentActivity implements OnMapReadyCa
     @Override
     public void onMapReady(GoogleMap googleMap) {
         map = googleMap;
-        /*
-        PolylineOptions line = new PolylineOptions();
-        line.add(new LatLng(59.146593, 37.887522));
-        line.add(new LatLng(59.125421, 37.931468));
-        line.add(new LatLng(59.11121, 37.960135));
-        line.add(new LatLng(59.107682, 38.083119));
-        line.color(Color.BLUE);
-        line.width(3);
-        line.geodesic(true);
-        map.addPolyline(line);
-
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(59.125421, 37.931468), 14));
-        */
-
+        updateMarker(mLastPos);
     }
 
     @Override
@@ -69,15 +55,7 @@ public class GoogleMapsActivity extends FragmentActivity implements OnMapReadyCa
             return;
         }
 
-        if (mMarker != null) {
-            mMarker.remove();
-        } else {
-            map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(newPos.latitude, newPos.longitude), 14));
-        }
-
-        MarkerOptions opt = new MarkerOptions();
-        opt.position(new LatLng(newPos.latitude, newPos.longitude));
-        mMarker = map.addMarker(opt);
+        updateMarker(newPos);
 
         if (mLastPos != null && !mLastPos.isFlightMode && newPos.isFlightMode) {
             // начало полёта
@@ -102,22 +80,40 @@ public class GoogleMapsActivity extends FragmentActivity implements OnMapReadyCa
             line.geodesic(true);
             mRoute = map.addPolyline(line);
         }
+    }
 
+    private void updateMarker(GpsData pos) {
+        if (map == null || pos == null) {
+            return;
+        }
 
+        if (mMarker != null) {
+            mMarker.remove();
+        } else {
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(pos.latitude, pos.longitude), 14));
+        }
+
+        MarkerOptions opt = new MarkerOptions();
+        opt.position(new LatLng(pos.latitude, pos.longitude));
+        opt.title(String.format("%s, %s", pos.latitude, pos.longitude));
+        mMarker = map.addMarker(opt);
+        mMarker.showInfoWindow();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         mModel.setGpsDataListener(null);
-        Log.d("1", "onPause");
+        // Log.d("1", "onPause");
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        mRouteData = mModel.route();
         mModel.setGpsDataListener(this);
-        Log.d("1", "onResume");
-
+        mLastPos = mModel.lastGpsPoint();
+        updateMarker(mLastPos);
+        // Log.d("1", "onResume");
     }
 }

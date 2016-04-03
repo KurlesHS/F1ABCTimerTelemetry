@@ -25,19 +25,28 @@ public class BluetoothDevice {
 
     private BluetoothDevice.BluetoothThreadWorker threadWorker = null;
 
-    private LinkedList<IBluetoothDataListener> listeners = new LinkedList<>();
+    private LinkedList<IBluetoothDataListener> mBluetoothDataListeners = new LinkedList<>();
+    private LinkedList<IBluetoothStatusListener> mBluetoothStatusListeners = new LinkedList<>();
 
     public BluetoothDevice(String deviceMacAddress) {
         BluetoothDevice.MyHandler handler = new BluetoothDevice.MyHandler(this);
         threadWorker = new BluetoothDevice.BluetoothThreadWorker(deviceMacAddress, handler);
     }
 
-    public void addBluetoothListener(IBluetoothDataListener listener) {
-        listeners.add(listener);
+    public void addBluetoothDataListener(IBluetoothDataListener listener) {
+        mBluetoothDataListeners.add(listener);
     }
 
-    public void removeBluetoothListener(IBluetoothDataListener listener) {
-        listeners.remove(listener);
+    public void removeBluetoothDataListener(IBluetoothDataListener listener) {
+        mBluetoothDataListeners.remove(listener);
+    }
+
+    public void addBluetoothStatusListener(IBluetoothStatusListener listener) {
+        mBluetoothStatusListeners.add(listener);
+    }
+
+    public void removeBluetoothStatusListener(IBluetoothStatusListener listener) {
+        mBluetoothStatusListeners.remove(listener);
     }
 
     public void start() {
@@ -82,19 +91,19 @@ public class BluetoothDevice {
     }
 
     private void informAboutConnectedState() {
-        for (IBluetoothDataListener listener : listeners) {
+        for (IBluetoothStatusListener listener : mBluetoothStatusListeners) {
             listener.connected();
         }
     }
 
     private void informAboutDisconnectedState() {
-        for (IBluetoothDataListener listener : listeners) {
+        for (IBluetoothStatusListener listener : mBluetoothStatusListeners) {
             listener.disconnected();
         }
     }
 
     private void informAboutReadyReadState() {
-        for (IBluetoothDataListener listener : listeners) {
+        for (IBluetoothDataListener listener : mBluetoothDataListeners) {
             listener.readyRead();
         }
     }

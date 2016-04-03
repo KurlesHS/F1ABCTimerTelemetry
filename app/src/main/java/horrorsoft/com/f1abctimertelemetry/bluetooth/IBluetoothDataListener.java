@@ -6,6 +6,4 @@ package horrorsoft.com.f1abctimertelemetry.bluetooth;
  */
 public interface IBluetoothDataListener {
     void readyRead();
-    void connected();
-    void disconnected();
 }

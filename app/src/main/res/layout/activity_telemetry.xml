@@ -1,0 +1,379 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="#000000"
+              android:orientation="vertical">
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_gravity="center"
+            android:layout_weight="20">
+
+        <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="105"
+                android:orientation="vertical"
+                android:paddingBottom="3dp"
+                android:paddingLeft="3dp"
+                android:paddingRight="3dp"
+                android:paddingTop="3dp" >
+
+            <ImageView
+                    android:id="@+id/imageViewBluetoothStatus"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="16"
+                    android:scaleType="fitXY"
+                    android:background="@drawable/bt_discon"/>
+
+            <ImageView
+                    android:id="@+id/imageView2"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="16"
+                    android:scaleType="fitXY"
+                    android:src="@drawable/ant_10"/>
+
+        </LinearLayout>
+
+        <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="51"
+        />
+        <ImageView
+                android:id="@+id/tm_flag_servo_view"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="33"
+                android:scaleType="fitXY"
+                android:background="@drawable/tm_background_fl" android:src="@drawable/tm_servo_flag_0"/>
+        <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="4"/>
+        <ImageView android:id="@+id/tm_flag_blink_view" android:layout_width="0dp" android:layout_height="match_parent"
+                   android:layout_weight="33" android:scaleType="fitXY"
+                   android:background="@drawable/tm_background_fl" android:src="@drawable/tm_blink_flag_0"/>
+        <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="4"/>
+        <ImageView android:id="@+id/tm_flag_dt_view" android:layout_width="0dp" android:layout_height="match_parent"
+                   android:layout_weight="33" android:scaleType="fitXY"
+                   android:background="@drawable/tm_background_fl" android:src="@drawable/tm_dt_flag_0"/>
+        <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="4"/>
+        <ImageView android:id="@+id/tm_flag_rdt_view" android:layout_width="0dp" android:layout_height="match_parent"
+                   android:layout_weight="33" android:scaleType="fitXY"
+                   android:background="@drawable/tm_background_fl" android:src="@drawable/tm_rdt_flag_0"/>
+
+    </LinearLayout>
+
+    <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="3">
+
+    </FrameLayout>
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_gravity="center"
+            android:layout_weight="44">
+
+        <FrameLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0">
+
+        </FrameLayout>
+
+        <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="100"
+                android:orientation="horizontal" android:layout_gravity="center">
+
+            <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="48"
+                    android:orientation="vertical">
+                <LinearLayout android:orientation="horizontal" android:layout_width="match_parent"
+                              android:layout_height="0dp" android:layout_weight="14"
+                              android:background="@drawable/tm_background_3">
+                    <FrameLayout android:layout_width="0dp" android:layout_height="match_parent"
+                                 android:layout_weight="1"/>
+                    <ImageView android:id="@+id/tm_alt_view" android:layout_width="0dp"
+                               android:layout_height="match_parent" android:layout_weight="36"
+                               android:scaleType="fitXY" android:src="@drawable/altitud"/>
+                    <FrameLayout android:layout_width="0dp" android:layout_height="match_parent"
+                                 android:layout_weight="2" android:background="@drawable/tm_sel_background"/>
+                    <FrameLayout android:layout_width="0dp" android:layout_height="match_parent"
+                                 android:layout_weight="5"/>
+                    <ImageView android:id="@+id/tm_alt_digit_1_view" android:layout_width="0dp"
+                               android:layout_height="match_parent" android:layout_weight="5"
+                               android:scaleType="fitXY" android:src="@drawable/digit_plus"/>
+                    <ImageView android:id="@+id/tm_alt_digit_2_view" android:layout_width="0dp"
+                               android:layout_height="match_parent" android:layout_weight="5"
+                               android:scaleType="fitXY" android:src="@drawable/digit_0"/>
+                    <ImageView android:id="@+id/tm_alt_digit_3_view" android:layout_width="0dp"
+                               android:layout_height="match_parent" android:layout_weight="5"
+                               android:scaleType="fitXY" android:src="@drawable/digit_1"/>
+                    <ImageView android:id="@+id/tm_alt_digit_4_view" android:layout_width="0dp"
+                               android:layout_height="match_parent" android:layout_weight="5"
+                               android:scaleType="fitXY" android:src="@drawable/digit_2"/>
+                    <ImageView android:id="@+id/tm_alt_digit_5_view" android:layout_width="0dp"
+                               android:layout_height="match_parent" android:layout_weight="5"
+                               android:scaleType="fitXY" android:src="@drawable/digit_3"/>
+                    <FrameLayout android:layout_width="0dp" android:layout_height="match_parent"
+                                 android:layout_weight="1"/>
+                </LinearLayout>
+                <FrameLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1"/>
+                <LinearLayout android:orientation="horizontal" android:layout_width="match_parent"
+                              android:layout_height="0dp" android:layout_weight="14"
+                              android:background="@drawable/tm_background_2">
+                    <FrameLayout android:layout_width="0dp" android:layout_height="match_parent"
+                                 android:layout_weight="1"/>
+                    <ImageView android:id="@+id/tm_timvol_view" android:layout_width="0dp"
+                               android:layout_height="match_parent" android:layout_weight="36"
+                               android:scaleType="fitXY" android:src="@drawable/voltage"
+                               android:focusableInTouchMode="false"/>
+                    <FrameLayout android:layout_width="0dp" android:layout_height="match_parent"
+                                 android:layout_weight="2" android:background="@drawable/tm_sel_background"/>
+                    <FrameLayout android:layout_width="0dp" android:layout_height="match_parent"
+                                 android:layout_weight="5"/>
+                    <ImageView android:id="@+id/tm_timvol_digit_1_view" android:layout_width="0dp"
+                               android:layout_height="match_parent" android:layout_weight="5"
+                               android:scaleType="fitXY" android:src="@drawable/digit_0"/>
+                    <ImageView android:id="@+id/tm_timvol_digit_2_view" android:layout_width="0dp"
+                               android:layout_height="match_parent" android:layout_weight="5"
+                               android:scaleType="fitXY" android:src="@drawable/digit_4"/>
+                    <ImageView android:id="@+id/tm_timvol_digit_3_view" android:layout_width="0dp"
+                               android:layout_height="match_parent" android:layout_weight="5"
+                               android:scaleType="fitXY" android:src="@drawable/digit_point"/>
+                    <ImageView android:id="@+id/tm_timvol_digit_4_view" android:layout_width="0dp"
+                               android:layout_height="match_parent" android:layout_weight="5"
+                               android:scaleType="fitXY" android:src="@drawable/digit_5"/>
+                    <ImageView android:id="@+id/tm_timvol_digit_5_view" android:layout_width="0dp"
+                               android:layout_height="match_parent" android:layout_weight="5"
+                               android:scaleType="fitXY" android:src="@drawable/digit_6"/>
+                    <FrameLayout android:layout_width="0dp" android:layout_height="match_parent"
+                                 android:layout_weight="1"/>
+                </LinearLayout>
+                <FrameLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1"/>
+                <LinearLayout android:orientation="horizontal" android:layout_width="match_parent"
+                              android:layout_height="0dp" android:layout_weight="14"
+                              android:background="@drawable/tm_background_4">
+                    <FrameLayout android:layout_width="0dp" android:layout_height="match_parent"
+                                 android:layout_weight="1"/>
+                    <ImageView android:id="@+id/tm_time_view" android:layout_width="0dp"
+                               android:layout_height="match_parent" android:layout_weight="36"
+                               android:scaleType="fitXY" android:src="@drawable/time_dt"/>
+                    <FrameLayout android:layout_width="0dp" android:layout_height="match_parent"
+                                 android:layout_weight="2" android:background="@drawable/tm_sel_background"/>
+                    <FrameLayout android:layout_width="0dp" android:layout_height="match_parent"
+                                 android:layout_weight="5"/>
+                    <ImageView android:id="@+id/tm_time_digit_1_view" android:layout_width="0dp"
+                               android:layout_height="match_parent" android:layout_weight="5"
+                               android:scaleType="fitXY" android:src="@drawable/digit_empty"/>
+                    <ImageView android:id="@+id/tm_time_digit_2_view" android:layout_width="0dp"
+                               android:layout_height="match_parent" android:layout_weight="5"
+                               android:scaleType="fitXY" android:src="@drawable/digit_0"/>
+                    <ImageView android:id="@+id/tm_time_digit_3_view" android:layout_width="0dp"
+                               android:layout_height="match_parent" android:layout_weight="5"
+                               android:scaleType="fitXY" android:src="@drawable/digit_7"/>
+                    <ImageView android:id="@+id/tm_time_digit_4_view" android:layout_width="0dp"
+                               android:layout_height="match_parent" android:layout_weight="5"
+                               android:scaleType="fitXY" android:src="@drawable/digit_9"/>
+                    <ImageView android:id="@+id/tm_time_digit_5_view" android:layout_width="0dp"
+                               android:layout_height="match_parent" android:layout_weight="5"
+                               android:scaleType="fitXY" android:src="@drawable/digit_4"/>
+                    <FrameLayout android:layout_width="0dp" android:layout_height="match_parent"
+                                 android:layout_weight="1"/>
+                </LinearLayout>
+            </LinearLayout>
+            <FrameLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="4">
+            </FrameLayout>
+            <LinearLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="48"
+                          android:orientation="vertical">
+                <LinearLayout android:orientation="horizontal" android:layout_width="match_parent"
+                              android:layout_height="0dp" android:layout_weight="14"
+                              android:background="@drawable/tm_background_7">
+                    <FrameLayout android:layout_width="0dp" android:layout_height="match_parent"
+                                 android:layout_weight="1"/>
+                    <ImageView android:id="@+id/tm_speed_view" android:layout_width="0dp"
+                               android:layout_height="match_parent" android:layout_weight="36"
+                               android:scaleType="fitXY" android:src="@drawable/speed"/>
+                    <FrameLayout android:layout_width="0dp" android:layout_height="match_parent"
+                                 android:layout_weight="2" android:background="@drawable/tm_sel_background"/>
+                    <FrameLayout android:layout_width="0dp" android:layout_height="match_parent"
+                                 android:layout_weight="5"/>
+                    <ImageView android:id="@+id/tm_speed_digit_1_view" android:layout_width="0dp"
+                               android:layout_height="match_parent" android:layout_weight="5"
+                               android:scaleType="fitXY" android:src="@drawable/digit_0"/>
+                    <ImageView android:id="@+id/tm_speed_digit_2_view" android:layout_width="0dp"
+                               android:layout_height="match_parent" android:layout_weight="5"
+                               android:scaleType="fitXY" android:src="@drawable/digit_2"/>
+                    <ImageView android:id="@+id/tm_speed_digit_3_view" android:layout_width="0dp"
+                               android:layout_height="match_parent" android:layout_weight="5"
+                               android:scaleType="fitXY" android:src="@drawable/digit_point"/>
+                    <ImageView android:id="@+id/tm_speed_digit_4_view" android:layout_width="0dp"
+                               android:layout_height="match_parent" android:layout_weight="5"
+                               android:scaleType="fitXY" android:src="@drawable/digit_5"/>
+                    <ImageView android:id="@+id/tm_speed_digit_5_view" android:layout_width="0dp"
+                               android:layout_height="match_parent" android:layout_weight="5"
+                               android:scaleType="fitXY" android:src="@drawable/digit_7"/>
+                    <FrameLayout android:layout_width="0dp" android:layout_height="match_parent"
+                                 android:layout_weight="1"/>
+                </LinearLayout>
+                <FrameLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1"/>
+                <LinearLayout android:orientation="horizontal" android:layout_width="match_parent"
+                              android:layout_height="0dp" android:layout_weight="14"
+                              android:background="@drawable/tm_background_6">
+                    <FrameLayout android:layout_width="0dp" android:layout_height="match_parent"
+                                 android:layout_weight="1"/>
+                    <ImageView android:id="@+id/tm_temp_view" android:layout_width="0dp"
+                               android:layout_height="match_parent" android:layout_weight="36"
+                               android:scaleType="fitXY" android:src="@drawable/temp"/>
+                    <FrameLayout android:layout_width="0dp" android:layout_height="match_parent"
+                                 android:layout_weight="2" android:background="@drawable/tm_sel_background"/>
+                    <FrameLayout android:layout_width="0dp" android:layout_height="match_parent"
+                                 android:layout_weight="5"/>
+                    <ImageView android:id="@+id/tm_temp_digit_1_view" android:layout_width="0dp"
+                               android:layout_height="match_parent" android:layout_weight="5"
+                               android:scaleType="fitXY" android:src="@drawable/digit_plus"/>
+                    <ImageView android:id="@+id/tm_temp_digit_2_view" android:layout_width="0dp"
+                               android:layout_height="match_parent" android:layout_weight="5"
+                               android:scaleType="fitXY" android:src="@drawable/digit_2"/>
+                    <ImageView android:id="@+id/tm_temp_digit_3_view" android:layout_width="0dp"
+                               android:layout_height="match_parent" android:layout_weight="5"
+                               android:scaleType="fitXY" android:src="@drawable/digit_1"/>
+                    <ImageView android:id="@+id/tm_temp_digit_4_view" android:layout_width="0dp"
+                               android:layout_height="match_parent" android:layout_weight="5"
+                               android:scaleType="fitXY" android:src="@drawable/digit_point"/>
+                    <ImageView android:id="@+id/tm_temp_digit_5_view" android:layout_width="0dp"
+                               android:layout_height="match_parent" android:layout_weight="5"
+                               android:scaleType="fitXY" android:src="@drawable/digit_6"/>
+                    <FrameLayout android:layout_width="0dp" android:layout_height="match_parent"
+                                 android:layout_weight="1"/>
+                </LinearLayout>
+                <FrameLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1"/>
+                <LinearLayout android:orientation="horizontal" android:layout_width="match_parent"
+                              android:layout_height="0dp" android:layout_weight="14"
+                              android:background="@drawable/tm_background_5">
+                    <FrameLayout android:layout_width="0dp" android:layout_height="match_parent"
+                                 android:layout_weight="1"/>
+                    <ImageView android:id="@+id/tm_prgn_view" android:layout_width="0dp"
+                               android:layout_height="match_parent" android:layout_weight="36"
+                               android:scaleType="fitXY" android:src="@drawable/progn"/>
+                    <FrameLayout android:layout_width="0dp" android:layout_height="match_parent"
+                                 android:layout_weight="2" android:background="@drawable/tm_sel_background"/>
+                    <FrameLayout android:layout_width="0dp" android:layout_height="match_parent"
+                                 android:layout_weight="5"/>
+                    <ImageView android:id="@+id/tm_prgn_digit_1_view" android:layout_width="0dp"
+                               android:layout_height="match_parent" android:layout_weight="5"
+                               android:scaleType="fitXY" android:src="@drawable/digit_empty"/>
+                    <ImageView android:id="@+id/tm_prgn_digit_2_view" android:layout_width="0dp"
+                               android:layout_height="match_parent" android:layout_weight="5"
+                               android:scaleType="fitXY" android:src="@drawable/digit_1"/>
+                    <ImageView android:id="@+id/tm_prgn_digit_3_view" android:layout_width="0dp"
+                               android:layout_height="match_parent" android:layout_weight="5"
+                               android:scaleType="fitXY" android:src="@drawable/digit_2"/>
+                    <ImageView android:id="@+id/tm_prgn_digit_4_view" android:layout_width="0dp"
+                               android:layout_height="match_parent" android:layout_weight="5"
+                               android:scaleType="fitXY" android:src="@drawable/digit_3"/>
+                    <ImageView android:id="@+id/tm_prgn_digit_5_view" android:layout_width="0dp"
+                               android:layout_height="match_parent" android:layout_weight="5"
+                               android:scaleType="fitXY" android:src="@drawable/digit_4"/>
+                    <FrameLayout android:layout_width="0dp" android:layout_height="match_parent"
+                                 android:layout_weight="1"/>
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+
+        <FrameLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0">
+
+        </FrameLayout>
+
+    </LinearLayout>
+
+    <FrameLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1"/>
+    <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="0dp" android:layout_weight="14">
+        <FrameLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent" android:layout_weight="26">
+        </FrameLayout>
+        <LinearLayout android:orientation="horizontal" android:layout_width="0dp" android:layout_height="match_parent"
+                      android:layout_weight="48" android:background="@drawable/tm_background_8">
+            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"/>
+            <ImageView android:id="@+id/tm_nodat_view" android:layout_width="0dp" android:layout_height="match_parent"
+                       android:layout_weight="36" android:scaleType="fitXY" android:src="@drawable/no_data"/>
+            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="2"
+                         android:background="@drawable/tm_sel_background"/>
+            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="5"/>
+            <ImageView android:id="@+id/tm_nodat_digit_1_view" android:layout_width="0dp" android:layout_height="match_parent"
+                       android:layout_weight="5" android:scaleType="fitXY" android:src="@drawable/digit_empty"/>
+            <ImageView android:id="@+id/tm_nodat_digit_2_view" android:layout_width="0dp" android:layout_height="match_parent"
+                       android:layout_weight="5" android:scaleType="fitXY" android:src="@drawable/digit_empty"/>
+            <ImageView android:id="@+id/tm_nodat_digit_3_view" android:layout_width="0dp" android:layout_height="match_parent"
+                       android:layout_weight="5" android:scaleType="fitXY" android:src="@drawable/digit_2"/>
+            <ImageView android:id="@+id/tm_nodat_digit_4_view" android:layout_width="0dp" android:layout_height="match_parent"
+                       android:layout_weight="5" android:scaleType="fitXY" android:src="@drawable/digit_1"/>
+            <ImageView android:id="@+id/tm_nodat_digit_5_view" android:layout_width="0dp" android:layout_height="match_parent"
+                       android:layout_weight="5" android:scaleType="fitXY" android:src="@drawable/digit_4"/>
+            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"/>
+        </LinearLayout>
+        <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="26"/>
+    </LinearLayout>
+    <FrameLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1"/>
+    <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="0dp"
+                  android:layout_weight="14">
+        <LinearLayout android:orientation="horizontal" android:layout_width="0dp" android:layout_height="match_parent"
+                      android:layout_weight="48" android:background="@drawable/tm_background_2">
+            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"/>
+            <ImageView android:id="@+id/tm_dtvol_view" android:layout_width="0dp" android:layout_height="match_parent"
+                       android:layout_weight="36" android:scaleType="fitXY" android:src="@drawable/voltage"/>
+            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="2"
+                         android:background="@drawable/tm_sel_background"/>
+            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="5"/>
+            <ImageView android:id="@+id/tm_dtvol_digit_1_view" android:layout_width="0dp" android:layout_height="match_parent"
+                       android:layout_weight="5" android:scaleType="fitXY" android:src="@drawable/digit_empty"/>
+            <ImageView android:id="@+id/tm_dtvol_digit_2_view" android:layout_width="0dp" android:layout_height="match_parent"
+                       android:layout_weight="5" android:scaleType="fitXY" android:src="@drawable/digit_2"/>
+            <ImageView android:id="@+id/tm_dtvol_digit_3_view" android:layout_width="0dp" android:layout_height="match_parent"
+                       android:layout_weight="5" android:scaleType="fitXY" android:src="@drawable/digit_point"/>
+            <ImageView android:id="@+id/tm_dtvol_digit_4_view" android:layout_width="0dp" android:layout_height="match_parent"
+                       android:layout_weight="5" android:scaleType="fitXY" android:src="@drawable/digit_8"/>
+            <ImageView android:id="@+id/tm_dtvol_digit_5_view" android:layout_width="0dp" android:layout_height="match_parent"
+                       android:layout_weight="5" android:scaleType="fitXY" android:src="@drawable/digit_7"/>
+            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"/>
+        </LinearLayout>
+        <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="4"/>
+        <LinearLayout android:orientation="horizontal" android:layout_width="0dp" android:layout_height="match_parent"
+                      android:layout_weight="48" android:background="@drawable/tm_background_1">
+            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"/>
+            <ImageView android:id="@+id/tm_sign_view" android:layout_width="0dp" android:layout_height="match_parent"
+                       android:layout_weight="36" android:scaleType="fitXY" android:src="@drawable/signal"/>
+            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="2"
+                         android:background="@drawable/tm_sel_background"/>
+            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="5"/>
+            <ImageView android:id="@+id/tm_sign_digit_1_view" android:layout_width="0dp" android:layout_height="match_parent"
+                       android:layout_weight="5" android:scaleType="fitXY" android:src="@drawable/digit_empty"/>
+            <ImageView android:id="@+id/tm_sign_digit_2_view" android:layout_width="0dp" android:layout_height="match_parent"
+                       android:layout_weight="5" android:scaleType="fitXY" android:src="@drawable/digit_empty"/>
+            <ImageView android:id="@+id/tm_sign_digit_3_view" android:layout_width="0dp" android:layout_height="match_parent"
+                       android:layout_weight="5" android:scaleType="fitXY" android:src="@drawable/digit_1"/>
+            <ImageView android:id="@+id/tm_sign_digit_4_view" android:layout_width="0dp" android:layout_height="match_parent"
+                       android:layout_weight="5" android:scaleType="fitXY" android:src="@drawable/digit_7"/>
+            <ImageView android:id="@+id/tm_sign_digit_5_view" android:layout_width="0dp" android:layout_height="match_parent"
+                       android:layout_weight="5" android:scaleType="fitXY" android:src="@drawable/digit_9"/>
+            <FrameLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"/>
+        </LinearLayout>
+    </LinearLayout>
+    <FrameLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="3"/>
+
+</LinearLayout>

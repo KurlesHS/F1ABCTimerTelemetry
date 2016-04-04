@@ -45,7 +45,7 @@ public class GoogleMapsActivity extends FragmentActivity implements OnMapReadyCa
 
     @Override
     public void newPosition(GpsData newPos) {
-        Log.d("1", "on new pos " + String.valueOf(newPos.isFlightMode) );
+        // Log.d("1", "on new pos " + String.valueOf(newPos.isFlightMode) );
         if (map == null) {
             return;
         }

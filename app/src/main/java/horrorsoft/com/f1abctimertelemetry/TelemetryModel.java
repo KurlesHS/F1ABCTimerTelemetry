@@ -126,12 +126,12 @@ class TelemetryModel implements IBluetoothDataListener, IBluetoothStatusListener
     }
 
     private void handleGpsDataResponse(byte[] buff) {
-        /*
-        byte crc8 = calculateCrc8(buff, 0x10);
-        if (crc8 != buff[0x10]) {
+
+        byte crc8 = calculateCrc8(buff, 0x0b);
+        if (crc8 != buff[0x0b]) {
             return;
         }
-        */
+
         byte bytes[] = new byte[4];
         System.arraycopy(buff, 3, bytes, 0, 4);
         float latitude = (float) (ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN).getInt() / 1000000.);

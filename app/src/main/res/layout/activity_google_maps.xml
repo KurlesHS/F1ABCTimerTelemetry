@@ -1,6 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
-<fragment xmlns:android="http://schemas.android.com/apk/res/android"
-          android:id="@+id/mapView"
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          android:name="com.google.android.gms.maps.SupportMapFragment"/>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:tools="http://schemas.android.com/tools"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+             tools:context=".MapActivity" >
+
+    <fragment xmlns:map="http://schemas.android.com/apk/res-auto"
+              android:id="@+id/mapView"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:layout_weight="1"
+              android:scrollbars="vertical"
+              class="com.google.android.gms.maps.SupportMapFragment"/>
+
+    <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:orientation="horizontal"
+            android:background="#80000000"
+            android:padding="4dp" android:layout_gravity="center_horizontal|top">
+
+
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="No Data..."
+                android:id="@+id/textViewCoords" android:layout_gravity="center"
+                android:textColor="@android:color/white"/>
+    </FrameLayout>
+    <LinearLayout
+            android:id="@+id/radio_group_list_selector"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:orientation="horizontal"
+            android:background="#80000000"
+            android:padding="4dp" android:layout_gravity="center_horizontal|bottom">
+
+
+
+        <CheckBox
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/checkBoxFollowPlane" android:layout_gravity="center_vertical" android:checked="false"
+                android:gravity="end"/>
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="follow plane"
+                android:textColor="@android:color/white"
+                android:id="@+id/textView" android:layout_gravity="center"/>
+        <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/imageView" android:layout_gravity="center"
+                android:src="@android:drawable/ic_menu_myplaces"/>
+        <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+        />
+        <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/buttonCenterOnCurrentPlanerPos"
+                android:src="@android:drawable/ic_menu_mylocation" android:cropToPadding="true"
+                android:layout_gravity="end"/>
+    </LinearLayout>
+</FrameLayout>

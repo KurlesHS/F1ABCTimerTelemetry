@@ -1,8 +1,13 @@
 package horrorsoft.com.f1abctimertelemetry;
 
+import android.app.Activity;
 import android.graphics.drawable.Drawable;
+import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import horrorsoft.com.f1abctimertelemetry.bluetooth.IBluetoothStatusListener;
 import org.androidannotations.annotations.*;
@@ -12,7 +17,7 @@ import java.util.ListIterator;
 
 @Fullscreen
 @EActivity(R.layout.activity_telemetry)
-public class TelemetryActivity extends AppCompatActivity implements IBluetoothStatusListener, ITelemetryDataListener {
+public class TelemetryActivity extends Activity implements IBluetoothStatusListener, ITelemetryDataListener {
 
     @Bean
     TelemetryModel mModel;
@@ -156,6 +161,7 @@ public class TelemetryActivity extends AppCompatActivity implements IBluetoothSt
     private Drawable emptyImg;
 
     private Drawable tmServoFlagOnImg;
+
     private Drawable tmServoFlagOffImg;
 
     private Drawable tmBlinkFlagOnImg;
@@ -166,6 +172,11 @@ public class TelemetryActivity extends AppCompatActivity implements IBluetoothSt
 
     private Drawable tmRdtFlagOnImg;
     private Drawable tmRdtFlagOffImg;
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
 
     @Override
     protected void onResume() {
@@ -183,7 +194,6 @@ public class TelemetryActivity extends AppCompatActivity implements IBluetoothSt
 
     @AfterViews
     void init() {
-
         altitudeDigitImages.add(tmAltDigit1);
         altitudeDigitImages.add(tmAltDigit2);
         altitudeDigitImages.add(tmAltDigit3);

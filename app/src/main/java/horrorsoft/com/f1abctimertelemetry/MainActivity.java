@@ -1,6 +1,7 @@
 package horrorsoft.com.f1abctimertelemetry;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
@@ -15,6 +16,8 @@ import org.androidannotations.annotations.*;
 public class MainActivity extends Activity implements IBluetoothStatusListener {
 
     private static final int REQUEST_BT_DEVICE_MAC_ADDRESS = 0;
+
+    private ProgressDialog progressDialog = null;
 
     @Bean
     TelemetryModel mModel;
@@ -75,7 +78,9 @@ public class MainActivity extends Activity implements IBluetoothStatusListener {
         if (resultCode == RESULT_OK) {
             String macAddress = data.getStringExtra(DeviceListActivity.EXTRA_DEVICE_ADDRESS);
             // Toast.makeText(this, value, Toast.LENGTH_SHORT).show();
+            progressDialog = ProgressDialog.show(this, "Connecting", "Please wait...", true);
             mModel.open(macAddress);
+
         } else {
             Toast.makeText(this, "cancel paired with bluetooth device", Toast.LENGTH_SHORT).show();
         }
@@ -96,13 +101,22 @@ public class MainActivity extends Activity implements IBluetoothStatusListener {
         return super.onOptionsItemSelected(item);
     }
 
+    private void dismissProgressDialog() {
+        if (progressDialog != null) {
+            progressDialog.dismiss();
+            progressDialog = null;
+        }
+    }
+
     @Override
     public void connected() {
         mConnectDisconnectButton.setText(getResources().getText(R.string.disconnect));
+        dismissProgressDialog();
     }
 
     @Override
     public void disconnected() {
         mConnectDisconnectButton.setText(getResources().getText(R.string.connect));
+        dismissProgressDialog();
     }
 }

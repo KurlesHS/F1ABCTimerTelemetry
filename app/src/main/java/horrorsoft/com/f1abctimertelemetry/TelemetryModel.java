@@ -16,7 +16,6 @@ import java.util.List;
 
 /**
  * Created by Alexey on 01.04.2016.
- *
  */
 @EBean(scope = EBean.Scope.Singleton)
 class TelemetryModel implements IBluetoothDataListener, IBluetoothStatusListener {
@@ -104,13 +103,13 @@ class TelemetryModel implements IBluetoothDataListener, IBluetoothStatusListener
                 telemetryData.act = buff[0x0c];
                 telemetryData.reservedD = buff[0x0d];
                 telemetryData.rssi = buff[0x0e];
-                telemetryData.pwr = ((float)(buff[0x0f] & 0xff) + 100f) * 0.01f;
+                telemetryData.pwr = ((float) (buff[0x0f] & 0xff) + 100f) * 0.01f;
                 telemetryData.rdtFlag = (firstInt & 0x01) != 0;
                 telemetryData.dtFlag = (firstInt & 0x02) != 0;
-                telemetryData.temperature = (float)t * 0.1f - 20f;
+                telemetryData.temperature = (float) t * 0.1f - 20f;
                 telemetryData.height = h - 0x40;
-                telemetryData.speed = (float)v * 0.01f;
-                telemetryData.voltage = (float)((secondInt >>> 22) & 0x03ff) * 0.01f;
+                telemetryData.speed = (float) v * 0.01f;
+                telemetryData.voltage = (float) ((secondInt >>> 22) & 0x03ff) * 0.01f;
                 telemetryData.timeToDt = (secondInt >>> 12) & 0x03ff;
                 telemetryData.prediction = (secondInt >>> 2) & 0x03ff;
                 telemetryData.blinkerOnFlag = (secondInt & 0x0002) != 0;
@@ -121,45 +120,39 @@ class TelemetryModel implements IBluetoothDataListener, IBluetoothStatusListener
         if (mTelemetryDataListener != null) {
             mTelemetryDataListener.result(telemetryData);
         }
-
-        sendGetGpsDataCommand();
     }
 
     private void handleGpsDataResponse(byte[] buff) {
 
         byte crc8 = calculateCrc8(buff, 0x0b);
-        if (crc8 != buff[0x0b]) {
-            return;
+        if (crc8 == buff[0x0b]) {
+            byte bytes[] = new byte[4];
+            System.arraycopy(buff, 3, bytes, 0, 4);
+            float latitude = (float) (ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN).getInt() / 1000000.);
+            System.arraycopy(buff, 7, bytes, 0, 4);
+            float longitude = (float) (ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN).getInt() / 1000000.);
+            boolean isFlightMode = (int) buff[2] != 0;
+            GpsData newPos = new GpsData(latitude, longitude, isFlightMode);
+
+            if (mLastGpsPoint != null && mLastGpsPoint.longitude == newPos.longitude && mLastGpsPoint.latitude == newPos.latitude) {
+                // те же данные - не засоряем данные. Хотя наверное это стоит делать в модели раз и не заморачиваться
+                return;
+            }
+
+            if (mLastGpsPoint != null && !mLastGpsPoint.isFlightMode && newPos.isFlightMode) {
+                // начало полёта
+                mRoute.clear();
+            }
+
+            if (newPos.isFlightMode) {
+                mRoute.add(newPos);
+            }
+            mLastGpsPoint = newPos;
+
+            if (mGpsDataListener != null) {
+                mGpsDataListener.newPosition(mLastGpsPoint);
+            }
         }
-
-        byte bytes[] = new byte[4];
-        System.arraycopy(buff, 3, bytes, 0, 4);
-        float latitude = (float) (ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN).getInt() / 1000000.);
-        System.arraycopy(buff, 7, bytes, 0, 4);
-        float longitude = (float) (ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN).getInt() / 1000000.);
-        boolean isFlightMode = (int) buff[2] != 0;
-        GpsData newPos = new GpsData(latitude, longitude, isFlightMode);
-
-        if (mLastGpsPoint != null && mLastGpsPoint.longitude == newPos.longitude && mLastGpsPoint.latitude == newPos.latitude) {
-            // те же данные - не засоряем данные. Хотя наверное это стоит делать в модели раз и не заморачиваться
-            return;
-        }
-
-        if (mLastGpsPoint != null && !mLastGpsPoint.isFlightMode && newPos.isFlightMode) {
-            // начало полёта
-            mRoute.clear();
-        }
-
-        if (newPos.isFlightMode) {
-            mRoute.add(newPos);
-        }
-        mLastGpsPoint = newPos;
-
-        if (mGpsDataListener != null) {
-            mGpsDataListener.newPosition(mLastGpsPoint);
-        }
-
-        sendGetTelemetryDataCommand();
     }
 
     @Override
@@ -171,9 +164,11 @@ class TelemetryModel implements IBluetoothDataListener, IBluetoothStatusListener
             switch (mCurrentMode) {
                 case TELEMETRY_RESPONSE:
                     handleTelemetryResponse(buff);
+                    sendGetGpsDataCommand();
                     break;
                 case GPS_RESPONSE:
                     handleGpsDataResponse(buff);
+                    sendGetTelemetryDataCommand();
                     break;
                 default:
                     break;

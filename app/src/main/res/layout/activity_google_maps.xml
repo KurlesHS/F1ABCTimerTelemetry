@@ -33,7 +33,7 @@
     <LinearLayout
             android:id="@+id/radio_group_list_selector"
             android:layout_width="match_parent"
-            android:layout_height="77dp"
+            android:layout_height="48dp"
             android:orientation="horizontal"
             android:background="#80000000"
             android:padding="4dp" android:layout_gravity="center_horizontal|bottom">
@@ -58,7 +58,7 @@
                 android:layout_weight="1"
         />
         <ImageButton
-                android:layout_width="77dp"
+                android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:id="@+id/buttonCenterOnCurrentPlanerPos"
                 android:src="@android:drawable/ic_menu_mylocation" android:cropToPadding="true"

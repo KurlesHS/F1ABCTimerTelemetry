@@ -3,7 +3,6 @@ package horrorsoft.com.f1abctimertelemetry;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
@@ -12,7 +11,7 @@ import horrorsoft.com.f1abctimertelemetry.bluetooth.DeviceListActivity;
 import horrorsoft.com.f1abctimertelemetry.bluetooth.IBluetoothStatusListener;
 import org.androidannotations.annotations.*;
 
-@EActivity
+@EActivity(R.layout.main_layout)
 public class MainActivity extends Activity implements IBluetoothStatusListener {
 
     private static final int REQUEST_BT_DEVICE_MAC_ADDRESS = 0;
@@ -24,13 +23,7 @@ public class MainActivity extends Activity implements IBluetoothStatusListener {
 
 
     @ViewById(R.id.button_connect_disconnect)
-    protected Button mConnectDisconnectButton;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.main_layout);
-    }
+    Button mConnectDisconnectButton;
 
     @Override
     protected void onPause() {

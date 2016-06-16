@@ -316,11 +316,11 @@ class TelemetryModel implements IBluetoothDataListener, IBluetoothStatusListener
             long1 = llong1*math.pi/180.
             long2 = llong2*math.pi/180.
             */
-            double lat1 = (double)mLastGpsPoint.latitude * Math.PI / 180.;
-            double lat2 = mLastKnownPhoneLocation.getLatitude() * Math.PI / 180.;
+            double lat2 = (double)mLastGpsPoint.latitude * Math.PI / 180.;
+            double lat1 = mLastKnownPhoneLocation.getLatitude() * Math.PI / 180.;
 
-            double long1 = (double)mLastGpsPoint.longitude * Math.PI / 180.;
-            double long2 = mLastKnownPhoneLocation.getLongitude() * Math.PI / 180.;
+            double long2 = (double)mLastGpsPoint.longitude * Math.PI / 180.;
+            double long1 = mLastKnownPhoneLocation.getLongitude() * Math.PI / 180.;
 
             /*
             #косинусы и синусы широт и разницы долгот
@@ -387,7 +387,7 @@ class TelemetryModel implements IBluetoothDataListener, IBluetoothStatusListener
 
             double anglerad2 = z2 - ((2*Math.PI)*Math.floor((z2/(2*Math.PI))) );
             double angledeg = (anglerad2*180.)/Math.PI;
-
+            result = (int)angledeg;
 
         }
         return (int)result;

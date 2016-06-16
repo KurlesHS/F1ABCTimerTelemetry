@@ -78,7 +78,9 @@ public class GoogleMapsActivity extends FragmentActivity implements SensorEventL
     @Override
     public void onMapReady(GoogleMap googleMap) {
         map = googleMap;
+        mPhoneLocation = mModel.lastKnownPhoneLocation();
         updateMarker(mLastPos);
+        updatePhoneLocationMarker();
     }
 
     @Click(R.id.buttonCenterOnCurrentPlanerPos)
@@ -232,18 +234,22 @@ public class GoogleMapsActivity extends FragmentActivity implements SensorEventL
         updatePhoneLocationMarker();
     }
 
-    public static Bitmap rotateImage(Bitmap src, float degree)
+    private static Bitmap rotateImage(Bitmap src, float degree)
     {
         // create new matrix
         Matrix matrix = new Matrix();
         // setup rotation degree
         matrix.postRotate(-degree);
-        Bitmap bmp = Bitmap.createBitmap(src, 0, 0, src.getWidth(), src.getHeight(), matrix, true);
-        return bmp;
+        return Bitmap.createBitmap(src, 0, 0, src.getWidth(), src.getHeight(), matrix, true);
     }
 
-    void updateCompassIcon() {
-        mImageButtonArrow.setImageBitmap(rotateImage(mIconBitmap, (float) mCompassAngleInDegrees));
+    private void updateCompassIcon() {
+        if (mModel.hasAzimuth()) {
+            int azimuth = mCompassAngleInDegrees - mModel.azimuth();
+
+
+            mImageButtonArrow.setImageBitmap(rotateImage(mIconBitmap, (float) azimuth));
+        }
     }
 
     @Override
@@ -258,8 +264,7 @@ public class GoogleMapsActivity extends FragmentActivity implements SensorEventL
             // we should not be here.
             return;
         }
-        for (int i=0 ; i<3 ; i++)
-            data[i] = event.values[i];
+        System.arraycopy(event.values, 0, data, 0, 3);
         SensorManager.getRotationMatrix(mR, mI, mGData, mMData);
 // some test code which will be used/cleaned up before we ship this.
 //        SensorManager.remapCoordinateSystem(mR,
@@ -276,9 +281,11 @@ public class GoogleMapsActivity extends FragmentActivity implements SensorEventL
             //mCompassAngleInDegrees += 1;
             mCompassAngleInRadians = mOrientation[0];
 
+            /*
             if (mCompassAngleInDegrees < 0) {
                 mCompassAngleInDegrees += 360;
             }
+            */
             Log.d("Compass", "yaw: " + mCompassAngleInDegrees +
                     "  pitch: " + (int)(mOrientation[1]*rad2deg) +
                     "  roll: " + (int)(mOrientation[2]*rad2deg) +

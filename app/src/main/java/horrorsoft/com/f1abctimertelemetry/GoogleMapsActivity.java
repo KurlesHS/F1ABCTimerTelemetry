@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.Matrix;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -12,7 +11,10 @@ import android.hardware.SensorManager;
 import android.location.Location;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
-import android.widget.ImageButton;
+import android.view.animation.Animation;
+import android.view.animation.RotateAnimation;
+import android.widget.CheckBox;
+import android.widget.ImageView;
 import android.widget.TextView;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -27,7 +29,6 @@ import java.util.List;
 
 @EActivity(R.layout.activity_google_maps)
 public class GoogleMapsActivity extends FragmentActivity implements SensorEventListener, OnMapReadyCallback, IGpsDataListener, IPhoneGpsLocationListener {
-
 
     private GoogleMap map = null;
 
@@ -44,22 +45,26 @@ public class GoogleMapsActivity extends FragmentActivity implements SensorEventL
 
     private Location mPhoneLocation = null;
 
+    private float mCurrentDegree = 0.f;
+
     private SensorManager mSensorManager;
     private float[] mGData = new float[3];
     private float[] mMData = new float[3];
     private float[] mR = new float[16];
     private float[] mI = new float[16];
     private float[] mOrientation = new float[3];
-    private int mCount;
 
     private int mCompassAngleInDegrees = 0;
-    private float mCompassAngleInRadians = 0;
 
+    private Bitmap mIconBitmap;
 
-    Bitmap mIconBitmap;
+    long mLastTime;
 
-    @ViewById(R.id.imageButtonArrow)
-    ImageButton mImageButtonArrow;
+    @ViewById(R.id.checkBoxShowArrow)
+    CheckBox mCheckBoxShowArrow;
+
+    @ViewById(R.id.imageViewForArrow)
+    ImageView mImageViewForArrow;
 
     @ViewById(R.id.textViewCoords)
     TextView textViewForCoords;
@@ -72,6 +77,7 @@ public class GoogleMapsActivity extends FragmentActivity implements SensorEventL
         mSensorManager = (SensorManager)getSystemService(Context.SENSOR_SERVICE);
         ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.mapView)).getMapAsync(this);
         mIconBitmap = BitmapFactory.decodeResource(getResources(),R.drawable.arrow_up_icon);
+        mCheckBoxShowArrow.setChecked(mModel.isShowDirectionArrow());
         updateCompassIcon();
     }
 
@@ -89,6 +95,14 @@ public class GoogleMapsActivity extends FragmentActivity implements SensorEventL
             map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mLastPos.latitude, mLastPos.longitude),
                     map.getCameraPosition().zoom));
         }
+    }
+
+    @CheckedChange(R.id.checkBoxShowArrow)
+    void showArrow(boolean isChecked) {
+        Log.d("1", String.format("is checked: %d", isChecked ? 1 : 0));
+        mModel.setShowDirectionArrow(isChecked);
+        updateCompassIcon();
+        // mImageViewForArrow.setVisibility(isChecked ? View.VISIBLE : View.GONE);
     }
 
     @CheckedChange(R.id.checkBoxFollowPlane)
@@ -143,7 +157,6 @@ public class GoogleMapsActivity extends FragmentActivity implements SensorEventL
             line.add(new LatLng(mModel.lastKnownPhoneLocation().getLatitude(), mModel.lastKnownPhoneLocation().getLongitude()));
             line.add(new LatLng(mModel.lastGpsPoint().latitude , mModel.lastGpsPoint().longitude));
 
-
             line.color(Color.RED);
             line.width(3);
             line.geodesic(true);
@@ -175,7 +188,7 @@ public class GoogleMapsActivity extends FragmentActivity implements SensorEventL
             return;
         }
 
-        textViewForCoords.setText(String.format("%f, %f", pos.latitude, pos.longitude));
+        textViewForCoords.setText(String.format("%f, %f  -  %s", pos.latitude, pos.longitude, mModel.distanceToModel()));
 
         if (mMarker != null) {
             mMarker.remove();
@@ -208,6 +221,7 @@ public class GoogleMapsActivity extends FragmentActivity implements SensorEventL
     @Override
     protected void onResume() {
         super.onResume();
+        mLastTime = System.currentTimeMillis();
 
         Sensor gSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         Sensor mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
@@ -226,30 +240,57 @@ public class GoogleMapsActivity extends FragmentActivity implements SensorEventL
         // Log.d("1", "onResume");
     }
 
-
-
     @Override
     public void newPhoneLocation(Location location) {
         mPhoneLocation = location;
         updatePhoneLocationMarker();
     }
 
-    private static Bitmap rotateImage(Bitmap src, float degree)
-    {
-        // create new matrix
-        Matrix matrix = new Matrix();
-        // setup rotation degree
-        matrix.postRotate(-degree);
-        return Bitmap.createBitmap(src, 0, 0, src.getWidth(), src.getHeight(), matrix, true);
-    }
-
     private void updateCompassIcon() {
-        if (mModel.hasAzimuth()) {
-            int azimuth = mCompassAngleInDegrees - mModel.azimuth();
-
-
-            mImageButtonArrow.setImageBitmap(rotateImage(mIconBitmap, (float) azimuth));
+        double azimuth = mModel.azimuth();
+        if (!mModel.isShowDirectionArrow()) {
+            if (mImageViewForArrow.getDrawable() != null) {
+                mImageViewForArrow.setImageDrawable(null);
+            }
+            return;
+        } else {
+            if (mImageViewForArrow.getDrawable() == null) {
+                mImageViewForArrow.setImageBitmap(mIconBitmap);
+            }
         }
+
+        long currentTime = System.currentTimeMillis();
+        long diff = currentTime - mLastTime;
+        // обновление стрелки не чаще раза в секунду
+        if (diff < 1000) {
+            return;
+        }
+        mLastTime = currentTime;
+        updateMarker(mLastPos);
+
+        float rotateTo;
+        if (mModel.hasAzimuth()) {
+            rotateTo = (float) (mCompassAngleInDegrees - azimuth);
+        } else {
+            rotateTo = (float)mCompassAngleInDegrees;
+        }
+
+        // create a rotation animation (reverse turn degree degrees)
+        RotateAnimation ra = new RotateAnimation(
+                mCurrentDegree,
+                -rotateTo,
+                Animation.RELATIVE_TO_SELF, 0.5f,
+                Animation.RELATIVE_TO_SELF,
+                0.5f);
+        // how long the animation will take place
+        ra.setDuration(220);
+
+        // set the animation after the end of the reservation status
+        ra.setFillAfter(true);
+
+        // Start the animation
+        mImageViewForArrow.startAnimation(ra);
+        mCurrentDegree = -rotateTo;
     }
 
     @Override
@@ -264,6 +305,7 @@ public class GoogleMapsActivity extends FragmentActivity implements SensorEventL
             // we should not be here.
             return;
         }
+
         System.arraycopy(event.values, 0, data, 0, 3);
         SensorManager.getRotationMatrix(mR, mI, mGData, mMData);
 // some test code which will be used/cleaned up before we ship this.
@@ -271,28 +313,12 @@ public class GoogleMapsActivity extends FragmentActivity implements SensorEventL
 //                SensorManager.AXIS_X, SensorManager.AXIS_Z, mR);
 //        SensorManager.remapCoordinateSystem(mR,
 //                SensorManager.AXIS_Y, SensorManager.AXIS_MINUS_X, mR);
+
         SensorManager.getOrientation(mR, mOrientation);
-        float incl = SensorManager.getInclination(mI);
-        if (mCount++ > 50) {
-            final float rad2deg = (float)(180.0f/Math.PI);
-            mCount = 0;
+        final float rad2deg = (float) (180.0f / Math.PI);
 
-            mCompassAngleInDegrees = (int)(mOrientation[0]*rad2deg);
-            //mCompassAngleInDegrees += 1;
-            mCompassAngleInRadians = mOrientation[0];
-
-            /*
-            if (mCompassAngleInDegrees < 0) {
-                mCompassAngleInDegrees += 360;
-            }
-            */
-            Log.d("Compass", "yaw: " + mCompassAngleInDegrees +
-                    "  pitch: " + (int)(mOrientation[1]*rad2deg) +
-                    "  roll: " + (int)(mOrientation[2]*rad2deg) +
-                    "  incl: " + (int)(incl*rad2deg)
-            );
-            updateCompassIcon();
-        }
+        mCompassAngleInDegrees = (int) (mOrientation[0] * rad2deg);
+        updateCompassIcon();
     }
 
     @Override

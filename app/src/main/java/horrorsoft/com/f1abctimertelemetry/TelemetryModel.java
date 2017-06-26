@@ -21,6 +21,7 @@ import org.androidannotations.annotations.RootContext;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.sql.Struct;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -41,13 +42,15 @@ class TelemetryModel implements IBluetoothDataListener, IBluetoothStatusListener
     private ITelemetryDataListener mTelemetryDataListener = null;
     private Location mLastKnownPhoneLocation = null;
 
+    private boolean mShowDirectionArrow = false;
+
     private List<IBluetoothStatusListener> mBluetToothListeners = new LinkedList<>();
 
     public IPhoneGpsLocationListener getPhoneGpsLocationListener() {
         return mPhoneGpsLocationListener;
     }
 
-    public void setPhoneGpsLocationListener(IPhoneGpsLocationListener phoneGpsLocationListener) {
+    void setPhoneGpsLocationListener(IPhoneGpsLocationListener phoneGpsLocationListener) {
         this.mPhoneGpsLocationListener = phoneGpsLocationListener;
     }
 
@@ -64,7 +67,9 @@ class TelemetryModel implements IBluetoothDataListener, IBluetoothStatusListener
 
     private Activity mCurrentActivity = null;
 
-    LocationManager mLocationManager = null;
+    private LocationManager mLocationManager = null;
+
+    private double mDistanceToModel = -1;
 
     @AfterInject
     void afterInject() {
@@ -97,6 +102,20 @@ class TelemetryModel implements IBluetoothDataListener, IBluetoothStatusListener
 
     boolean mIsPhoneGpsEnabled() {
         return mLocationManager != null;
+    }
+
+    public String distanceToModel() {
+        String result = "N/A";
+        if (hasAzimuth()) {
+            azimuth();
+            if (mDistanceToModel <= 1999) {
+                result = (int)mDistanceToModel + "m";
+            } else {
+                double km = mDistanceToModel / 1000;
+                result = String.format ("%.2fkm", km);
+            }
+        }
+        return result;
     }
 
     void enableGpsTracking() {
@@ -238,9 +257,22 @@ class TelemetryModel implements IBluetoothDataListener, IBluetoothStatusListener
         if (crc8 == buff[0x0b]) {
             byte bytes[] = new byte[4];
             System.arraycopy(buff, 3, bytes, 0, 4);
-            float latitude = (float) (ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN).getInt() / 1000000.);
+            int latitudeInt = ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN).getInt();
+            float latitude = (float) (latitudeInt / 1000000.);
             System.arraycopy(buff, 7, bytes, 0, 4);
-            float longitude = (float) (ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN).getInt() / 1000000.);
+            int longitudeInt = ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN).getInt();
+            float longitude = (float) (longitudeInt / 1000000.);
+
+            // координаты Хреново
+            int checkLat = 474111088 / 8;
+            int checkLon = 317785424 / 8;
+
+            if (longitudeInt == checkLon && latitudeInt == checkLat) {
+                return;
+            } else if (longitudeInt == checkLat && latitudeInt == checkLon) {
+                return;
+            }
+
             boolean isFlightMode = (int) buff[2] != 0;
             GpsData newPos = new GpsData(latitude, longitude, isFlightMode);
 
@@ -353,7 +385,7 @@ class TelemetryModel implements IBluetoothDataListener, IBluetoothStatusListener
             double y = Math.sqrt(Math.pow(cl2*sdelta,2)+Math.pow(cl1*sl2-sl1*cl2*cdelta,2));
             double x = sl1*sl2+cl1*cl2*cdelta;
             double ad = Math.atan2(y,x);
-            double dist = ad*rad;
+            mDistanceToModel = ad * rad;
 
             /*
             #вычисление начального азимута
@@ -478,8 +510,8 @@ class TelemetryModel implements IBluetoothDataListener, IBluetoothStatusListener
     @Override
     public void onLocationChanged(Location location) {
         Log.d("test", String.format("%f %f", location.getLatitude(), location.getLongitude()));
-        Toast.makeText(context, String.format("%f %f", location.getLatitude(), location.getLongitude()),
-                Toast.LENGTH_SHORT).show();
+        //Toast.makeText(context, String.format("%f %f", location.getLatitude(), location.getLongitude()),
+        //        Toast.LENGTH_SHORT).show();
         mLastKnownPhoneLocation = location;
         if (mPhoneGpsLocationListener != null) {
             mPhoneGpsLocationListener.newPhoneLocation(location);
@@ -505,5 +537,13 @@ class TelemetryModel implements IBluetoothDataListener, IBluetoothStatusListener
         Log.d("test", "disabled: " + provider);
         Toast.makeText(context, "disabled: " + provider,
                 Toast.LENGTH_SHORT).show();
+    }
+
+    public boolean isShowDirectionArrow() {
+        return mShowDirectionArrow;
+    }
+
+    public void setShowDirectionArrow(boolean showDirectionArrow) {
+        this.mShowDirectionArrow = showDirectionArrow;
     }
 }

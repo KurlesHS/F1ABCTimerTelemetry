@@ -189,6 +189,7 @@ public class TelemetryActivity extends Activity implements IBluetoothStatusListe
         super.onResume();
         mModel.addBlueToothStatusListener(this);
         mModel.setTelemetryDataListener(this);
+        mModel.setCurrentActivity(this);
     }
 
     @Override
@@ -196,6 +197,7 @@ public class TelemetryActivity extends Activity implements IBluetoothStatusListe
         super.onPause();
         mModel.removeBlueToothStatusListener(this);
         mModel.setTelemetryDataListener(null);
+        mModel.setCurrentActivity(null);
     }
 
     @AfterViews

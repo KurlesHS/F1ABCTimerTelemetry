@@ -11,10 +11,10 @@ android {
 
     defaultConfig {
         applicationId "horrorsoft.com.f1abctimertelemetry"
-        minSdkVersion 16
-        targetSdkVersion 30
-        versionCode 4
-        versionName "1.04"
+        minSdkVersion 9
+        targetSdkVersion 23
+        versionCode 109
+        versionName "1.09"
     }
     buildTypes {
         release {

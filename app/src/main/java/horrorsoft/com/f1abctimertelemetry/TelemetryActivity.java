@@ -3,17 +3,23 @@ package horrorsoft.com.f1abctimertelemetry;
 import android.app.Activity;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.content.res.ResourcesCompat;
-import android.support.v7.app.AppCompatActivity;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.ImageView;
-import horrorsoft.com.f1abctimertelemetry.bluetooth.IBluetoothStatusListener;
-import org.androidannotations.annotations.*;
+
+import androidx.annotation.Nullable;
+import androidx.core.content.res.ResourcesCompat;
+
+import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.Bean;
+import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.Fullscreen;
+import org.androidannotations.annotations.UiThread;
+import org.androidannotations.annotations.ViewById;
 
 import java.util.ArrayList;
 import java.util.ListIterator;
+
+import horrorsoft.com.f1abctimertelemetry.bluetooth.IBluetoothStatusListener;
+
 
 @Fullscreen
 @EActivity(R.layout.activity_telemetry)

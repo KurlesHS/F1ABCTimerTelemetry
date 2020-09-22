@@ -1,6 +1,8 @@
 package horrorsoft.com.f1abctimertelemetry;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -9,6 +11,8 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.location.Location;
+import android.net.Uri;
+import android.os.Build;
 import android.util.Log;
 import android.view.animation.Animation;
 import android.view.animation.RotateAnimation;
@@ -16,6 +20,7 @@ import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.FragmentActivity;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -35,9 +40,15 @@ import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.util.LinkedList;
 import java.util.List;
 
+import static horrorsoft.com.f1abctimertelemetry.GpsPointFile.readFileLastPointGps;
 
 @EActivity(R.layout.activity_google_maps)
 public class GoogleMapsActivity extends FragmentActivity implements SensorEventListener, OnMapReadyCallback, IGpsDataListener, IPhoneGpsLocationListener {
@@ -69,6 +80,8 @@ public class GoogleMapsActivity extends FragmentActivity implements SensorEventL
     private int mCompassAngleInDegrees = 0;
 
     private Bitmap mIconBitmap;
+    private int saveFileRequestCode = 1;
+    private int openFileRequestCode = 2;
 
     long mLastTime;
 
@@ -97,6 +110,9 @@ public class GoogleMapsActivity extends FragmentActivity implements SensorEventL
     public void onMapReady(GoogleMap googleMap) {
         map = googleMap;
         mPhoneLocation = mModel.lastKnownPhoneLocation();
+        if (mLastPos == null) {
+            mLastPos = readFileLastPointGps(mModel.context);
+        }
         updateMarker(mLastPos);
         updatePhoneLocationMarker();
     }
@@ -121,6 +137,55 @@ public class GoogleMapsActivity extends FragmentActivity implements SensorEventL
     void followPlaneStateChanged(boolean isChecked) {
         Log.d("1", String.format("is checked: %d", isChecked ? 1 : 0));
         followPlane = isChecked;
+    }
+
+
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    @Click(R.id.button_save_point_file)
+    void onSavePointFile() {
+        Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("*/*"); //not needed, but maybe usefull
+        intent.putExtra(Intent.EXTRA_TITLE, "default.ser");
+        startActivityForResult(intent, saveFileRequestCode);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    @Click(R.id.button_load_point_file)
+    void onLoadPointFile() {
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("*/*"); //not needed, but maybe usefull
+        startActivityForResult(intent, openFileRequestCode);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == saveFileRequestCode && resultCode == Activity.RESULT_OK) {
+            Uri uri = data.getData();
+            try {
+                assert uri != null;
+                OutputStream output = mModel.context.getContentResolver().openOutputStream(uri);
+                ObjectOutputStream oos = new ObjectOutputStream(output);
+                oos.writeObject(mLastPos);
+            }
+            catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        if (requestCode == openFileRequestCode && resultCode == Activity.RESULT_OK) {
+            Uri uri = data.getData();
+            try {
+                assert uri != null;
+                FileInputStream in = (FileInputStream) getContentResolver().openInputStream(uri);
+                ObjectInputStream ois = new ObjectInputStream(in);
+                mLastPos = (GpsData) ois.readObject();
+            }
+            catch (IOException | ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override

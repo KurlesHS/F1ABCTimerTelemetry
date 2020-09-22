@@ -30,43 +30,69 @@
                 android:id="@+id/textViewCoords" android:layout_gravity="center"
                 android:textColor="@android:color/white"/>
     </FrameLayout>
+
     <LinearLayout
-            android:id="@+id/radio_group_list_selector"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:orientation="horizontal"
-            android:background="#80000000"
-            android:padding="4dp" android:layout_gravity="center_horizontal|bottom">
-
-
+        android:id="@+id/radio_group_list_selector"
+        android:layout_width="wrap_content"
+        android:layout_height="48dp"
+        android:layout_gravity="center_horizontal|bottom"
+        android:background="#80000000"
+        android:orientation="horizontal"
+        android:padding="4dp">
 
         <CheckBox
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/checkBoxFollowPlane" android:layout_gravity="center_vertical" android:checked="false"
-                android:gravity="end"/>
+            android:id="@+id/checkBoxShowArrow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:checked="false" />
+        <CheckBox
+            android:id="@+id/checkBoxFollowPlane"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:checked="false"
+            android:gravity="end" />
+
         <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="follow the plane"
-                android:textColor="@android:color/white"
-                android:id="@+id/textView" android:layout_gravity="center"/>
+            android:id="@+id/textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="follow the plane"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@android:color/white" />
+
         <View
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-        />
-        <CheckBox
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/checkBoxShowArrow" android:layout_gravity="center_vertical" android:checked="false"/>
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
         <ImageButton
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:id="@+id/buttonCenterOnCurrentPlanerPos"
-                android:src="@android:drawable/ic_menu_mylocation" android:cropToPadding="true"
-                android:layout_gravity="end"/>
+            android:id="@+id/button_save_point_file"
+            android:layout_width="48dp"
+            android:layout_height="44dp"
+            android:layout_gravity="end"
+            android:cropToPadding="true"
+            android:src="@android:drawable/ic_menu_save" />
+
+        <ImageButton
+            android:id="@+id/button_load_point_file"
+            android:layout_width="48dp"
+            android:layout_height="44dp"
+            android:layout_gravity="end"
+            android:cropToPadding="true"
+            android:src="@android:drawable/ic_menu_upload" />
+
+
+        <ImageButton
+            android:id="@+id/buttonCenterOnCurrentPlanerPos"
+            android:layout_width="48dp"
+            android:layout_height="44dp"
+            android:layout_gravity="end"
+            android:cropToPadding="true"
+            android:src="@android:drawable/ic_menu_mylocation" />
+
     </LinearLayout>
     <ImageView
             android:layout_width="match_parent"

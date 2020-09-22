@@ -1,24 +1,23 @@
 package horrorsoft.com.f1abctimertelemetry;
 
-import android.Manifest;
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
-import android.os.Bundle;
-import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.Toast;
+
+import org.androidannotations.annotations.Bean;
+import org.androidannotations.annotations.Click;
+import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.OnActivityResult;
+import org.androidannotations.annotations.ViewById;
+
 import horrorsoft.com.f1abctimertelemetry.bluetooth.DeviceListActivity;
 import horrorsoft.com.f1abctimertelemetry.bluetooth.IBluetoothStatusListener;
-import org.androidannotations.annotations.*;
 
 @EActivity(R.layout.main_layout)
 public class MainActivity extends Activity implements IBluetoothStatusListener {

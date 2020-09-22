@@ -8,12 +8,11 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.widget.Toast;
-import horrorsoft.com.f1abctimertelemetry.bluetooth.BluetoothDevice;
-import horrorsoft.com.f1abctimertelemetry.bluetooth.IBluetoothDataListener;
-import horrorsoft.com.f1abctimertelemetry.bluetooth.IBluetoothStatusListener;
+
+import androidx.core.app.ActivityCompat;
+
 import org.androidannotations.annotations.AfterInject;
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.EBean;
@@ -21,9 +20,14 @@ import org.androidannotations.annotations.RootContext;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.sql.Struct;
 import java.util.LinkedList;
 import java.util.List;
+
+import horrorsoft.com.f1abctimertelemetry.bluetooth.BluetoothDevice;
+import horrorsoft.com.f1abctimertelemetry.bluetooth.IBluetoothDataListener;
+import horrorsoft.com.f1abctimertelemetry.bluetooth.IBluetoothStatusListener;
+
+import static horrorsoft.com.f1abctimertelemetry.GpsPointFile.saveFileLastPointGps;
 
 /**
  * Created by Alexey on 01.04.2016.
@@ -290,6 +294,7 @@ class TelemetryModel implements IBluetoothDataListener, IBluetoothStatusListener
                 mRoute.add(newPos);
             }
             mLastGpsPoint = newPos;
+            saveFileLastPointGps(context, mLastGpsPoint);
 
             if (mGpsDataListener != null) {
                 mGpsDataListener.newPosition(mLastGpsPoint);

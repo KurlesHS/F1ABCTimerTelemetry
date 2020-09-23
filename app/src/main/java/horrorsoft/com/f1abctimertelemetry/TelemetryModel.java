@@ -122,6 +122,10 @@ class TelemetryModel implements IBluetoothDataListener, IBluetoothStatusListener
         return result;
     }
 
+    public void setMLastGpsPoint(GpsData point) {
+        mLastGpsPoint=point;
+    }
+
     void enableGpsTracking() {
         if (mLocationManager != null) {
             if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ) {

@@ -111,7 +111,7 @@ public class GoogleMapsActivity extends FragmentActivity implements SensorEventL
         map = googleMap;
         mPhoneLocation = mModel.lastKnownPhoneLocation();
         if (mLastPos == null) {
-            mLastPos = readFileLastPointGps(mModel.context);
+            loadPoint(readFileLastPointGps(mModel.context));
         }
         updateMarker(mLastPos);
         updatePhoneLocationMarker();
@@ -122,6 +122,15 @@ public class GoogleMapsActivity extends FragmentActivity implements SensorEventL
         if (mLastPos != null && map != null) {
             map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mLastPos.latitude, mLastPos.longitude),
                     map.getCameraPosition().zoom));
+        }
+    }
+
+    private void loadPoint(GpsData loadPoint){
+        if (loadPoint != null) {
+            mModel.setMLastGpsPoint(loadPoint);
+            mRouteData.clear();
+            loadPoint.isFlightMode=true;
+            newPosition(loadPoint);
         }
     }
 
@@ -180,7 +189,7 @@ public class GoogleMapsActivity extends FragmentActivity implements SensorEventL
                 assert uri != null;
                 FileInputStream in = (FileInputStream) getContentResolver().openInputStream(uri);
                 ObjectInputStream ois = new ObjectInputStream(in);
-                mLastPos = (GpsData) ois.readObject();
+                loadPoint((GpsData) ois.readObject());
             }
             catch (IOException | ClassNotFoundException e) {
                 e.printStackTrace();

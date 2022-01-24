@@ -1,10 +1,19 @@
 package horrorsoft.com.f1abctimertelemetry;
 
+import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.os.Bundle;
+import android.util.Log;
 import android.widget.Toast;
-import horrorsoft.com.f1abctimertelemetry.bluetooth.BluetoothDevice;
-import horrorsoft.com.f1abctimertelemetry.bluetooth.IBluetoothDataListener;
-import horrorsoft.com.f1abctimertelemetry.bluetooth.IBluetoothStatusListener;
+
+import androidx.core.app.ActivityCompat;
+
+import org.androidannotations.annotations.AfterInject;
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.EBean;
 import org.androidannotations.annotations.RootContext;
@@ -14,11 +23,18 @@ import java.nio.ByteOrder;
 import java.util.LinkedList;
 import java.util.List;
 
+import horrorsoft.com.f1abctimertelemetry.bluetooth.BluetoothDevice;
+import horrorsoft.com.f1abctimertelemetry.bluetooth.IBluetoothDataListener;
+import horrorsoft.com.f1abctimertelemetry.bluetooth.IBluetoothStatusListener;
+
+import static horrorsoft.com.f1abctimertelemetry.GpsPointFile.saveFileLastPointGps;
+
 /**
  * Created by Alexey on 01.04.2016.
+ * !
  */
 @EBean(scope = EBean.Scope.Singleton)
-class TelemetryModel implements IBluetoothDataListener, IBluetoothStatusListener {
+class TelemetryModel implements IBluetoothDataListener, IBluetoothStatusListener, IGpsDataListener, LocationListener {
     private static final int IDLE = 0;
     private static final int TELEMETRY_RESPONSE = 1;
     private static final int GPS_RESPONSE = 2;
@@ -28,8 +44,23 @@ class TelemetryModel implements IBluetoothDataListener, IBluetoothStatusListener
     private int mCurrentMode = IDLE;
     private IGpsDataListener mGpsDataListener = null;
     private ITelemetryDataListener mTelemetryDataListener = null;
+    private Location mLastKnownPhoneLocation = null;
+
+    private boolean mShowDirectionArrow = false;
 
     private List<IBluetoothStatusListener> mBluetToothListeners = new LinkedList<>();
+
+    public IPhoneGpsLocationListener getPhoneGpsLocationListener() {
+        return mPhoneGpsLocationListener;
+    }
+
+    void setPhoneGpsLocationListener(IPhoneGpsLocationListener phoneGpsLocationListener) {
+        this.mPhoneGpsLocationListener = phoneGpsLocationListener;
+    }
+
+    private IPhoneGpsLocationListener mPhoneGpsLocationListener = null;
+
+    private boolean mIsInInitializeGpsMode = false;
 
     @RootContext
     protected Context context;
@@ -37,6 +68,17 @@ class TelemetryModel implements IBluetoothDataListener, IBluetoothStatusListener
     private BluetoothDevice device = null;
 
     private GpsData mLastGpsPoint = null;
+
+    private Activity mCurrentActivity = null;
+
+    private LocationManager mLocationManager = null;
+
+    private double mDistanceToModel = -1;
+
+    @AfterInject
+    void afterInject() {
+
+    }
 
     TelemetryModel() {
 
@@ -61,6 +103,101 @@ class TelemetryModel implements IBluetoothDataListener, IBluetoothStatusListener
     List<GpsData> route() {
         return mRoute;
     }
+
+    boolean mIsPhoneGpsEnabled() {
+        return mLocationManager != null;
+    }
+
+    public String distanceToModel() {
+        String result = "N/A";
+        if (hasAzimuth()) {
+            azimuth();
+            if (mDistanceToModel <= 1999) {
+                result = (int)mDistanceToModel + "m";
+            } else {
+                double km = mDistanceToModel / 1000;
+                result = String.format ("%.2fkm", km);
+            }
+        }
+        return result;
+    }
+
+    public void setMLastGpsPoint(GpsData point) {
+        mLastGpsPoint=point;
+    }
+
+    void enableGpsTracking() {
+        if (mLocationManager != null) {
+            if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                return;
+            }
+            mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 0, this);
+
+            Location location = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            if (location != null) {
+                mLastKnownPhoneLocation = location;
+            }
+        }
+    }
+
+    void disableGpsTracking() {
+        if (mLocationManager != null) {
+            if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                return;
+            }
+            mLocationManager.removeUpdates(this);
+        }
+    }
+
+    boolean initializePhoneGps() {
+        if (mCurrentActivity == null) {
+            return false;
+        }
+
+        if (mLocationManager != null) {
+            return true;
+        }
+
+        int permission = ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
+        if (permission != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            if (!mIsInInitializeGpsMode) {
+                mIsInInitializeGpsMode = true;
+                ActivityCompat.requestPermissions(mCurrentActivity, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 200);
+            } else {
+                mIsInInitializeGpsMode = false;
+            }
+
+            return false;
+        }
+
+        mLocationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+        mIsInInitializeGpsMode = false;
+        Log.d("test", "location manager init ok");
+        return true;
+    }
+
+
 
     public void open(String macAddress) {
         if (device == null) {
@@ -128,9 +265,22 @@ class TelemetryModel implements IBluetoothDataListener, IBluetoothStatusListener
         if (crc8 == buff[0x0b]) {
             byte bytes[] = new byte[4];
             System.arraycopy(buff, 3, bytes, 0, 4);
-            float latitude = (float) (ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN).getInt() / 1000000.);
+            int latitudeInt = ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN).getInt();
+            float latitude = (float) (latitudeInt / 1000000.);
             System.arraycopy(buff, 7, bytes, 0, 4);
-            float longitude = (float) (ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN).getInt() / 1000000.);
+            int longitudeInt = ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN).getInt();
+            float longitude = (float) (longitudeInt / 1000000.);
+
+            // координаты Хреново
+            int checkLat = 474111088 / 8;
+            int checkLon = 317785424 / 8;
+
+            if (longitudeInt == checkLon && latitudeInt == checkLat) {
+                return;
+            } else if (longitudeInt == checkLat && latitudeInt == checkLon) {
+                return;
+            }
+
             boolean isFlightMode = (int) buff[2] != 0;
             GpsData newPos = new GpsData(latitude, longitude, isFlightMode);
 
@@ -148,6 +298,7 @@ class TelemetryModel implements IBluetoothDataListener, IBluetoothStatusListener
                 mRoute.add(newPos);
             }
             mLastGpsPoint = newPos;
+            saveFileLastPointGps(context, mLastGpsPoint);
 
             if (mGpsDataListener != null) {
                 mGpsDataListener.newPosition(mLastGpsPoint);
@@ -191,6 +342,100 @@ class TelemetryModel implements IBluetoothDataListener, IBluetoothStatusListener
 
     private void sendGetTelemetryDataCommand() {
         sendCommand(0xff, TELEMETRY_RESPONSE);
+    }
+
+    public int azimuth()
+    {
+        double result = 0;
+        if (hasAzimuth()) {
+            // инфа взята с http://wiki.gis-lab.info/w/%D0%92%D1%8B%D1%87%D0%B8%D1%81%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%D1%80%D0%B0%D1%81%D1%81%D1%82%D0%BE%D1%8F%D0%BD%D0%B8%D1%8F_%D0%B8_%D0%BD%D0%B0%D1%87%D0%B0%D0%BB%D1%8C%D0%BD%D0%BE%D0%B3%D0%BE_%D0%B0%D0%B7%D0%B8%D0%BC%D1%83%D1%82%D0%B0_%D0%BC%D0%B5%D0%B6%D0%B4%D1%83_%D0%B4%D0%B2%D1%83%D0%BC%D1%8F_%D1%82%D0%BE%D1%87%D0%BA%D0%B0%D0%BC%D0%B8_%D0%BD%D0%B0_%D1%81%D1%84%D0%B5%D1%80%D0%B5
+
+            final  float rad = 6372795; // радиус земли
+            /* python code
+            lat1 = llat1*math.pi/180.
+            lat2 = llat2*math.pi/180.
+            long1 = llong1*math.pi/180.
+            long2 = llong2*math.pi/180.
+            */
+            double lat2 = (double)mLastGpsPoint.latitude * Math.PI / 180.;
+            double lat1 = mLastKnownPhoneLocation.getLatitude() * Math.PI / 180.;
+
+            double long2 = (double)mLastGpsPoint.longitude * Math.PI / 180.;
+            double long1 = mLastKnownPhoneLocation.getLongitude() * Math.PI / 180.;
+
+            /*
+            #косинусы и синусы широт и разницы долгот
+            cl1 = math.cos(lat1)
+            cl2 = math.cos(lat2)
+            sl1 = math.sin(lat1)
+            sl2 = math.sin(lat2)
+            delta = long2 - long1
+            cdelta = math.cos(delta)
+            sdelta = math.sin(delta)
+            */
+
+            double cl1 = Math.cos(lat1);
+            double cl2 = Math.cos(lat2);
+            double sl1 = Math.sin(lat1);
+            double sl2 = Math.sin(lat2);
+            double delta = long2 - long1;
+            double cdelta = Math.cos(delta);
+            double sdelta = Math.sin(delta);
+
+            /*
+            #вычисления длины большого круга
+            y = math.sqrt(math.pow(cl2*sdelta,2)+math.pow(cl1*sl2-sl1*cl2*cdelta,2))
+            x = sl1*sl2+cl1*cl2*cdelta
+            ad = math.atan2(y,x)
+            dist = ad*rad
+            */
+
+            // вычисления длины большого круга
+            double y = Math.sqrt(Math.pow(cl2*sdelta,2)+Math.pow(cl1*sl2-sl1*cl2*cdelta,2));
+            double x = sl1*sl2+cl1*cl2*cdelta;
+            double ad = Math.atan2(y,x);
+            mDistanceToModel = ad * rad;
+
+            /*
+            #вычисление начального азимута
+            x = (cl1*sl2) - (sl1*cl2*cdelta)
+            y = sdelta*cl2
+            z = math.degrees(math.atan(-y/x))
+
+            if (x < 0):
+                z = z+180.
+
+            z2 = (z+180.) % 360. - 180.
+            z2 = - math.radians(z2)
+            anglerad2 = z2 - ((2*math.pi)*math.floor((z2/(2*math.pi))) )
+            angledeg = (anglerad2*180.)/math.pi
+            */
+
+            // вычисление начального азимута
+
+            final double rad2deg = 180.0f/Math.PI;
+
+            x = (cl1*sl2) - (sl1*cl2*cdelta);
+            y = sdelta*cl2;
+            double z = Math.atan(-y/x) * rad2deg;
+
+            if (x < 0) {
+                z = z + 180.;
+            }
+
+            double z2 = (z+180.) % 360. - 180.;
+            z2 = - (z2 / rad2deg);
+
+            double anglerad2 = z2 - ((2*Math.PI)*Math.floor((z2/(2*Math.PI))) );
+            double angledeg = (anglerad2*180.)/Math.PI;
+            result = (int)angledeg;
+
+        }
+        return (int)result;
+    }
+
+    public boolean hasAzimuth() {
+        return mLastGpsPoint != null && mLastKnownPhoneLocation != null;
     }
 
     @Override
@@ -252,5 +497,62 @@ class TelemetryModel implements IBluetoothDataListener, IBluetoothStatusListener
 
     void removeBlueToothStatusListener(IBluetoothStatusListener listener) {
         mBluetToothListeners.remove(listener);
+    }
+
+    @Override
+    public void newPosition(GpsData newPos) {
+
+    }
+
+    public Activity getCurrentActivity() {
+        return mCurrentActivity;
+    }
+
+    public Location lastKnownPhoneLocation() {
+        return mLastKnownPhoneLocation;
+    }
+
+    public void setCurrentActivity(Activity mCurrentActivity) {
+        this.mCurrentActivity = mCurrentActivity;
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        Log.d("test", String.format("%f %f", location.getLatitude(), location.getLongitude()));
+        //Toast.makeText(context, String.format("%f %f", location.getLatitude(), location.getLongitude()),
+        //        Toast.LENGTH_SHORT).show();
+        mLastKnownPhoneLocation = location;
+        if (mPhoneGpsLocationListener != null) {
+            mPhoneGpsLocationListener.newPhoneLocation(location);
+        }
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+        Log.d("test", provider + status);
+        Toast.makeText(context, provider + status,
+                Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+        Log.d("test", "enabled: " + provider);
+        Toast.makeText(context, "enabled: " + provider,
+                Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+        Log.d("test", "disabled: " + provider);
+        Toast.makeText(context, "disabled: " + provider,
+                Toast.LENGTH_SHORT).show();
+    }
+
+    public boolean isShowDirectionArrow() {
+        return mShowDirectionArrow;
+    }
+
+    public void setShowDirectionArrow(boolean showDirectionArrow) {
+        this.mShowDirectionArrow = showDirectionArrow;
     }
 }

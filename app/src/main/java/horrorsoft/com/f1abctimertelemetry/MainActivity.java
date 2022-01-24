@@ -3,16 +3,23 @@ package horrorsoft.com.f1abctimertelemetry;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.os.Bundle;
+import android.location.Location;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.Toast;
+
+import org.androidannotations.annotations.Bean;
+import org.androidannotations.annotations.Click;
+import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.OnActivityResult;
+import org.androidannotations.annotations.ViewById;
+
 import horrorsoft.com.f1abctimertelemetry.bluetooth.DeviceListActivity;
 import horrorsoft.com.f1abctimertelemetry.bluetooth.IBluetoothStatusListener;
-import org.androidannotations.annotations.*;
 
-@EActivity
+@EActivity(R.layout.main_layout)
 public class MainActivity extends Activity implements IBluetoothStatusListener {
 
     private static final int REQUEST_BT_DEVICE_MAC_ADDRESS = 0;
@@ -24,24 +31,30 @@ public class MainActivity extends Activity implements IBluetoothStatusListener {
 
 
     @ViewById(R.id.button_connect_disconnect)
-    protected Button mConnectDisconnectButton;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.main_layout);
-    }
+    Button mConnectDisconnectButton;
 
     @Override
     protected void onPause() {
         super.onPause();
         mModel.removeBlueToothStatusListener(this);
+        mModel.setCurrentActivity(null);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         mModel.addBlueToothStatusListener(this);
+        mModel.setCurrentActivity(this);
+        mModel.initializePhoneGps();
+        mModel.enableGpsTracking();
+        mModel.lastKnownPhoneLocation();
+        Location location = mModel.lastKnownPhoneLocation();
+        if (location == null) {
+            Log.d("test", "location is null");
+        } else {
+            Log.d("test", "location is :" + location.getLatitude() + ", " + location.getLongitude());
+        }
+
     }
 
     @Override
